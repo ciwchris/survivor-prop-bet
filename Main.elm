@@ -9,6 +9,7 @@ import Material.Grid exposing (grid, cell, size, Device(..))
 import Material.Options exposing (Style, css)
 import Material.Scheme
 import Material.Badge
+import Material.Typography
 
 
 style : List (Style a)
@@ -116,13 +117,17 @@ betQuestions : Model -> List (Material.Grid.Cell Msg)
 betQuestions model =
     List.concatMap
         (\bet ->
-            [ cell [ size All 2 ] [ text "coins" ]
-            , cell [ size All 2 ] [ text "name" ]
+            [ cell [ size All 2 ] [ betCoin True ]
+            , cell [ size All 2 ] [ select [] (List.map (\c -> option [] [ text c ]) contentants) ]
             , cell [ size All 8 ]
-                [ text bet.question
+                [ Material.Options.styled span
+                    [ Material.Typography.subhead ]
+                    [ text bet.question ]
                 , if bet.value > 1 then
                     Material.Options.span
-                        [ Material.Badge.add ("x" ++ (toString <| bet.value)) ]
+                        [ Material.Badge.add ("x" ++ (toString <| bet.value))
+                        , Material.Badge.noBackground
+                        ]
                         []
                   else
                     Material.Options.span [] []
@@ -130,6 +135,16 @@ betQuestions model =
             ]
         )
         model.bets
+
+
+betCoin : Bool -> Svg.Svg Msg
+betCoin filled =
+    Svg.svg
+        [ width "80", height "20", viewBox "2.5 0 3 3" ]
+        [ (ellipse [ cx "0", cy "1.5", rx "1.5", ry "1.25", fill "gold", stroke "gold", strokeWidth ".2", onClick CoinClick ] [])
+        , (ellipse [ cx "3.5", cy "1.5", rx "1.5", ry "1.25", fill "none", stroke "gold", strokeWidth ".2", onClick CoinClick ] [])
+        , (ellipse [ cx "7", cy "1.5", rx "1.5", ry "1.25", fill "none", stroke "gold", strokeWidth ".2", onClick CoinClick ] [])
+        ]
 
 
 coinStack : Int -> List (Svg.Svg Msg)
@@ -146,7 +161,7 @@ coin coinNumber stackNumber =
         positionY =
             17 - (0.5 * (toFloat <| coinNumber)) |> toString
     in
-        (ellipse [ cx positionX, cy positionY, rx "2", ry "1.5", fill "none", fill "gold", stroke "white", strokeWidth ".2", onClick CoinClick ] [])
+        (ellipse [ cx positionX, cy positionY, rx "2", ry "1.5", fill "gold", stroke "white", strokeWidth ".2", onClick CoinClick ] [])
 
 
 main : Program Never
